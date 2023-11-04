@@ -70,11 +70,11 @@ func (out *Output) Set(value string) error {
 
 type Header struct {
     Magic        [4]byte
-    Epoch        uint32
-    Date         int32
-    Sku          uint16
+    Epoch        uint32   // Binary Coded Decimal Y2K 
+    Timestamp    int32    // Seconds since epoch
+    Sku          uint16   // Gateway stock keeping unit 
     Unknown      uint16
-    SerialNumber [16]byte
+    SerialNumber [16]byte // Gateway serial number
 }
 
 func (h Header) isValid() bool {
@@ -122,7 +122,7 @@ func makeHeader() Header {
     start := time.Date(2000, 3, 1, 0, 0, 0, 0, time.UTC)
     end := time.Now()
 
-    h.Date = int32(end.Sub(start).Seconds())
+    h.Timestamp = int32(end.Sub(start).Seconds())
 
     return h
 }
