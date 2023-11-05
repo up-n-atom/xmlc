@@ -71,14 +71,14 @@ func (out *Output) Set(value string) error {
 type Header struct {
     Magic        [4]byte
     Epoch        uint32   // Binary Coded Decimal Y2K 
-    Timestamp    int32    // Seconds since epoch
+    Timestamp    uint32   // Seconds since epoch
     Sku          uint16   // Gateway stock keeping unit 
     Unknown      uint16
     SerialNumber [16]byte // Gateway serial number
 }
 
 func (h Header) isValid() bool {
-    return bytes.Compare(h.Magic[:], []byte(xmlc)) == 0 && h.Epoch == uint32(y2k)
+    return bytes.Compare(h.Magic[:], []byte(xmlc)) == 0 && h.Epoch == y2k
 }
 
 func (h Header) GenerateKeys(aes []byte, iv []byte) error {
@@ -86,7 +86,7 @@ func (h Header) GenerateKeys(aes []byte, iv []byte) error {
 
     buf := new(bytes.Buffer)
 
-    binary.Write(buf, binary.LittleEndian, uint32(pepper1))
+    binary.Write(buf, binary.LittleEndian, pepper1)
     binary.Write(buf, binary.LittleEndian, h)
 
     hash = md5.Sum(buf.Bytes())
@@ -95,7 +95,7 @@ func (h Header) GenerateKeys(aes []byte, iv []byte) error {
 
     buf.Reset()
 
-    binary.Write(buf, binary.LittleEndian, uint32(pepper2))
+    binary.Write(buf, binary.LittleEndian, pepper2)
 
     hash = md5.Sum(buf.Bytes())
 
@@ -103,7 +103,7 @@ func (h Header) GenerateKeys(aes []byte, iv []byte) error {
 
     buf.Reset()
 
-    binary.Write(buf, binary.LittleEndian, uint32(pepper3))
+    binary.Write(buf, binary.LittleEndian, pepper3)
 
     hash = md5.Sum(buf.Bytes())
 
@@ -117,12 +117,12 @@ func makeHeader() Header {
 
     copy(h.Magic[:], []byte(xmlc))
 
-    h.Epoch = uint32(y2k)
+    h.Epoch = y2k
 
     start := time.Date(2000, 3, 1, 0, 0, 0, 0, time.UTC)
     end := time.Now()
 
-    h.Timestamp = int32(end.Sub(start).Seconds())
+    h.Timestamp = uint32(end.Sub(start).Seconds())
 
     return h
 }
@@ -147,7 +147,7 @@ func (ctx Context) CompressAndEncode() error {
     zw := gzip.NewWriter(&buf)
 
     if _, err := io.Copy(zw, in); err != nil {
-        return io.ErrUnexpectedEOF
+        return err
     }
 
     if err := zw.Close(); err != nil {
@@ -247,11 +247,11 @@ func (ctx Context) DecodeAndExpand() error {
 
 const (
     empty = ""
-    pepper1 = 0x78563412
-    pepper2 = 0x75d7bc0a
-    pepper3 = 0xb7542a91
-    xmlc = "XMLC"
-    y2k = 0x20000301
+    pepper1 = uint32(0x78563412)
+    pepper2 = uint32(0x75d7bc0a)
+    pepper3 = uint32(0xb7542a91)
+    xmlc    = "XMLC"
+    y2k     = uint32(0x20000301)
 )
 
 var (
