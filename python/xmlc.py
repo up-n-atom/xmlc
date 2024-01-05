@@ -52,7 +52,7 @@ def compress(in_file: BinaryIO, out_file: BinaryIO) -> None:
         encrypt(in_buf, out_file)
 
 
-if __name__ == '__main__':
+def main() -> None:
     parser = argparse.ArgumentParser(description='XMLC tool')
     parser.add_argument('-c', '--compress', action='store_true')
     parser.add_argument("infile",
@@ -72,3 +72,7 @@ if __name__ == '__main__':
             sys.exit(1)
 
     sys.exit(0)
+
+
+if __name__ == '__main__':
+    main()
