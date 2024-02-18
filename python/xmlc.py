@@ -68,8 +68,7 @@ def main() -> None:
         try:
             action(in_file, out_file)
         except (ValueError, zlib.error) as e:
-            print(e, file=sys.stderr)
-            sys.exit(1)
+            sys.exit(str(e))
 
     sys.exit(0)
 
