@@ -17,7 +17,7 @@ It can also be helpful to restore the router to factory defaults and save a copy
 ### Python
 
 The Python implementation requires the `pycryptodomex` library, with version `3.19.0` or greater. This can be installed using `pip install pycryptodomex`.
-
+The Python implementation requires the `pycryptodomex` library, with version `3.19.0` or greater. This can be installed using `pip install -r requirements.txt` or `pip install pycryptodomex`.
 1. Use the web interface for "Save Configuration" to retrieve the encrypted `config.dat` file
 2. Run `python3 xmlc.py config.dat config.xml` to decrypt `config.dat` into `config.xml`
 3. Make changes to `config.xml` as desired
