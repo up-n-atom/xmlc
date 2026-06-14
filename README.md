@@ -14,6 +14,43 @@ This utility was created for and tested using an Arris NVG468MQ router using fir
 
 It can also be helpful to restore the router to factory defaults and save a copy of that configuration.
 
+### Docker Quick Start (No Dependencies)
+
+If you want to use this tool without installing Go, Python, or external libraries on your local machine, you can run it inside a temporary, disposable Docker container. 
+
+This command mounts your current directory, clones the tool, decrypts your `config.dat`, pauses to let you edit the resulting `config.xml` file on your host machine, re-encrypts your changes, and completely cleans up the container environment when done.
+
+1. Open your terminal and navigate to the directory containing your exported `config.dat` file.
+2. Copy and run the following interactive command:
+
+```bash
+docker run -it --rm \
+  -v "$(pwd)":/data \
+  -w /data \
+  golang:alpine \
+  sh -c "
+    apk add --no-cache git && \
+    git clone https://github.com/up-n-atom/xmlc.git && \
+    cd xmlc/go && \
+    \
+    go run xmlc.go /data/config.dat /data/config.xml && \
+    \
+    printf '\n[+] File decrypted to config.xml. Make any changes necessary now.\n' && \
+    printf '    Press [ENTER] when you are ready to re-encrypt... ' && \
+    read -r _ && \
+    \
+    printf '\n[+] Re-encrypting to config-updated.dat...\n' && \
+    go run xmlc.go -c /data/config.xml /data/config-updated.dat && \
+    printf '[+] Done!\n'
+  "
+```
+
+3. *(Optional)* If you do not intend to use Go containers again, clean up the downloaded image from your local disk:
+
+```bash
+docker rmi golang:alpine
+```
+
 ### Python
 
 The Python implementation requires the `pycryptodomex` library, with version `3.19.0` or greater. This can be installed using `pip install -r requirements.txt` or `pip install pycryptodomex`.
@@ -30,7 +67,7 @@ The Go implementation does not require any prerequisite installations.
 1. Use the web interface for "Save Configuration" to retrieve the encrypted `config.dat` file
 2. Run `go run xmlc.go config.dat config.xml` to decrypt `config.dat` into `config.xml`
 3. Make changes to `config.xml` as desired
-4. Run `go run xmlc.py -c config.xml config.dat` to encrypt `config.xml` back into `config.dat`
+4. Run `go run xmlc.go -c config.xml config.dat` to encrypt `config.xml` back into `config.dat`
 5. Use the web interface for "Load Configuration" to load the modified configuration
 
 ## Configuration Editing
